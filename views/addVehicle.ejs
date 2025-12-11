@@ -1,0 +1,634 @@
+<%- include('layout/header') %>
+
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 md:p-8">
+  <!-- Main Container -->
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Navigation Header -->
+    <div class="mb-8 flex justify-between items-center">
+      <a 
+        href="/" 
+        class="inline-flex items-center space-x-3 group"
+      >
+        <div class="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-white">Bike Record</h1>
+          <p class="text-gray-400 text-sm">Vehicle Management System</p>
+        </div>
+      </a>
+      <div class="hidden md:block">
+        <div class="px-4 py-2 bg-gray-800/50 rounded-xl border border-gray-700">
+          <span class="text-gray-300"><%= product ? 'Editing Bike' : 'Adding New Bike' %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="glass-effect rounded-2xl border border-gray-700 shadow-2xl overflow-hidden">
+      <!-- Card Header -->
+      <div class="bg-gradient-to-r from-gray-800 to-gray-900 p-6 border-b border-gray-700">
+        <div class="flex items-center space-x-4">
+          <div class="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-white">
+              <%= product ? 'Edit Bike Details' : 'Insert New Bike Record' %>
+            </h2>
+            <p class="text-gray-300">
+              <%= product ? 'Update existing bike information' : 'Add a new bike to your inventory' %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <div class="p-6">
+        <form
+          action="<%= product ? `/api/product/update/${product.id}` : '/api/product/add' %>"
+          method="post"
+          id="product-form"
+          enctype="multipart/form-data"
+          class="space-y-8"
+        >
+          <% if (product) { %>
+          <input type="hidden" name="_method" value="PUT" />
+          <input type="hidden" name="id" value="<%= product.id %>" />
+          <% } %>
+
+          <!-- Row 1: Basic Information -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Name -->
+            <div class="space-y-3">
+              <label for="name" class="block text-sm font-medium text-gray-200">
+                Bike Name
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="name"
+                  name="name" 
+                  placeholder="Enter bike name" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 transition duration-200"
+                  value="<%= product ? product.name : '' %>"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Model Year -->
+            <div class="space-y-3">
+              <label for="model_year" class="block text-sm font-medium text-gray-200">
+                Model Year
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="model_year"
+                  name="model_year" 
+                  placeholder="e.g., 2023" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 transition duration-200"
+                  value="<%= product ? product.model_year : '' %>"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Mileage -->
+            <div class="space-y-3">
+              <label for="mileage" class="block text-sm font-medium text-gray-200">
+                Mileage (km/l)
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="mileage"
+                  name="mileage" 
+                  placeholder="Enter mileage" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 transition duration-200"
+                  value="<%= product ? product.mileage : '' %>"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="space-y-3">
+              <label for="price" class="block text-sm font-medium text-gray-200">
+                Price (₹)
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="price"
+                  name="price" 
+                  placeholder="Enter price" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 transition duration-200"
+                  value="<%= product ? product.price : '' %>"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 2: Technical Specifications -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Engine CC -->
+            <div class="space-y-3">
+              <label for="engine_cc" class="block text-sm font-medium text-gray-200">
+                Engine CC
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="engine_cc"
+                  name="engine_cc" 
+                  placeholder="e.g., 150" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 transition duration-200"
+                  value="<%= product ? product.engine_cc : '' %>"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Fuel Type -->
+            <div class="space-y-3">
+              <label for="fuel_type" class="block text-sm font-medium text-gray-200">
+                Fuel Type
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                </div>
+                <select 
+                  id="fuel_type"
+                  name="fuel_type" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white appearance-none transition duration-200"
+                >
+                  <option value="">Select Fuel Type</option>
+                  <option value="Petrol" <%= product && product.fuel_type === 'Petrol' ? 'selected' : '' %>>Petrol</option>
+                  <option value="Electric" <%= product && product.fuel_type === 'Electric' ? 'selected' : '' %>>Electric</option>
+                  <option value="Diesel" <%= product && product.fuel_type === 'Diesel' ? 'selected' : '' %>>Diesel</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color -->
+            <div class="space-y-3">
+              <label for="color" class="block text-sm font-medium text-gray-200">
+                Bike Color
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+                  </svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="color"
+                  name="color" 
+                  placeholder="Enter color" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 transition duration-200"
+                  value="<%= product ? product.color : '' %>"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Brand & Transmission -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Brand -->
+            <div class="space-y-3">
+              <label for="brand_id" class="block text-sm font-medium text-gray-200">
+                Brand
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                </div>
+                <select 
+                  id="brand_id"
+                  name="brand_id" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white appearance-none transition duration-200"
+                >
+                  <option value="">Select Brand</option>
+                  <% if (brands && brands.length) { %>
+                    <% brands.forEach(brand => { %>
+                      <option 
+                        value="<%= brand.id %>" 
+                        <%= product && product.brand_id == brand.id ? 'selected' : '' %>
+                        class="bg-gray-800"
+                      >
+                        <%= brand.name %>
+                      </option>
+                    <% }); %>
+                  <% } %>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="space-y-3">
+              <label for="image" class="block text-sm font-medium text-gray-200">
+                Bike Images
+                <span class="text-blue-400">(Multiple)</span>
+              </label>
+              <div class="relative group">
+                <input 
+                  type="file" 
+                  id="image"
+                  name="image" 
+                  multiple 
+                  accept="image/*"
+                  class="hidden"
+                  onchange="previewImages(event)"
+                />
+                <label for="image" class="cursor-pointer">
+                  <div class="border-2 border-dashed border-gray-600 rounded-2xl p-6 text-center hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-300 group-hover:scale-[1.02]">
+                    <div class="space-y-3">
+                      <div class="mx-auto w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-gray-300 font-medium">Click to upload images</p>
+                        <p class="text-sm text-gray-400">Multiple images supported</p>
+                      </div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <!-- Image Preview -->
+              <div id="imagePreview" class="mt-4 hidden">
+                <p class="text-sm text-gray-300 mb-2">Selected images:</p>
+                <div id="previewContainer" class="flex flex-wrap gap-2"></div>
+              </div>
+            </div>
+
+            <!-- Transmission -->
+            <div class="space-y-3">
+              <label for="transmission" class="block text-sm font-medium text-gray-200">
+                Transmission
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                </div>
+                <select 
+                  id="transmission"
+                  name="transmission" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white appearance-none transition duration-200"
+                >
+                  <option value="Manual" <%= product && product.transmission === 'Manual' ? 'selected' : '' %>>Manual</option>
+                  <option value="Automatic" <%= product && product.transmission === 'Automatic' ? 'selected' : '' %>>Automatic</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: ABS & Description -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- ABS -->
+            <div class="space-y-3">
+              <label for="abs" class="block text-sm font-medium text-gray-200">
+                ABS System
+                <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                </div>
+                <select 
+                  id="abs"
+                  name="abs" 
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white appearance-none transition duration-200"
+                >
+                  <option value="1" <%= product && product.abs === '1' ? 'selected' : '' %>>Yes</option>
+                  <option value="0" <%= product && product.abs === '0' ? 'selected' : '' %>>No</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-3 md:col-span-2">
+              <label for="description" class="block text-sm font-medium text-gray-200">
+                Description
+                <span class="text-blue-400">(Optional)</span>
+              </label>
+              <div class="relative">
+                <div class="absolute top-3 left-3 flex items-start pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                  </svg>
+                </div>
+                <textarea 
+                  id="description"
+                  name="description" 
+                  rows="4"
+                  class="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-white placeholder-gray-400 resize-none transition duration-200"
+                  placeholder="Enter bike description (features, condition, etc.)"
+                ><%= product ? product.description : '' %></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-6 border-t border-gray-700/50">
+            <button
+              type="submit"
+              id="submitBtn"
+              class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center space-x-3"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+              </svg>
+              <span class="text-lg">
+                <%= product ? 'Update Bike Record' : 'Insert Bike Record' %>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Existing Images Preview (for edit mode) -->
+    <% if (product && product.images && product.images.length > 0) { %>
+    <div class="glass-effect rounded-2xl border border-gray-700 shadow-xl mt-8 p-6">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-white">Existing Images</h3>
+      </div>
+      <div class="flex flex-wrap gap-4">
+        <% product.images.forEach((image, index) => { %>
+        <div class="relative group">
+          <img 
+            src="<%= image %>" 
+            alt="Bike Image <%= index + 1 %>"
+            class="w-32 h-32 object-cover rounded-xl border-2 border-gray-600 group-hover:border-blue-500 transition-all duration-300"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 rounded-xl transition-all duration-300 flex items-end justify-center p-2">
+            <span class="text-white text-sm">Image <%= index + 1 %></span>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  // Preview multiple images
+  function previewImages(event) {
+    const files = event.target.files;
+    const previewContainer = document.getElementById('previewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Clear previous previews
+    previewContainer.innerHTML = '';
+    
+    if (files.length > 0) {
+      imagePreview.classList.remove('hidden');
+      
+      for (let i = 0; i < Math.min(files.length, 4); i++) { // Limit preview to 4 images
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const imgContainer = document.createElement('div');
+          imgContainer.className = 'relative group';
+          imgContainer.innerHTML = `
+            <img src="${e.target.result}" class="w-24 h-24 object-cover rounded-lg border border-gray-600" />
+            <div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <button type="button" onclick="this.parentElement.parentElement.remove()" class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs hover:bg-red-600">
+                ×
+              </button>
+            </div>
+          `;
+          previewContainer.appendChild(imgContainer);
+        }
+        
+        reader.readAsDataURL(file);
+      }
+      
+      if (files.length > 4) {
+        const moreText = document.createElement('div');
+        moreText.className = 'text-gray-400 text-sm mt-2';
+        moreText.textContent = `+ ${files.length - 4} more images`;
+        previewContainer.appendChild(moreText);
+      }
+    } else {
+      imagePreview.classList.add('hidden');
+    }
+  }
+
+  // Form submission with enhanced UI
+  document.getElementById("product-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = `
+      <svg class="animate-spin w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Processing...
+    `;
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(e.target);
+    const action = e.target.action;
+    const method = action.includes('update') ? 'PUT' : 'POST';
+    
+    try {
+      const response = await fetch(action, {
+        method: method,
+        body: formData,
+      });
+      
+      // Check response type
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Server returned non-JSON response`);
+      }
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        // Show success notification
+        showNotification(result.message || "Operation successful!", 'success');
+        
+        // Redirect after delay
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 1500);
+      } else {
+        showNotification(result.error || "Error processing request", 'error');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      showNotification(`Error: ${error.message}`, 'error');
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+
+  // Notification function
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-6 right-6 px-6 py-4 rounded-xl shadow-2xl z-50 animate-slide-in-right ${
+      type === 'success' ? 'bg-gradient-to-r from-green-600 to-emerald-600' :
+      type === 'error' ? 'bg-gradient-to-r from-red-600 to-rose-600' :
+      'bg-gradient-to-r from-blue-600 to-cyan-600'
+    }`;
+    notification.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          ${type === 'success' ? 
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>' :
+            '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.342 16.5c-.77.833.192 2.5 1.732 2.5z"></path>'
+          }
+        </svg>
+        <span class="text-white font-medium">${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.classList.add('animate-slide-out-right');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // Add CSS animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slide-in-right {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slide-out-right {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .animate-slide-in-right {
+      animation: slide-in-right 0.3s ease-out;
+    }
+    
+    .animate-slide-out-right {
+      animation: slide-out-right 0.3s ease-in forwards;
+    }
+    
+    .glass-effect {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+    }
+    
+    select:focus {
+      background-color: rgba(30, 41, 59, 0.7);
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Price formatting
+  const priceInput = document.getElementById('price');
+  if (priceInput) {
+    priceInput.addEventListener('blur', function() {
+      if (this.value) {
+        const value = parseFloat(this.value.replace(/[^\d.]/g, ''));
+        if (!isNaN(value)) {
+          this.value = '₹' + value.toLocaleString('en-IN');
+        }
+      }
+    });
+    
+    priceInput.addEventListener('focus', function() {
+      this.value = this.value.replace(/[^\d.]/g, '');
+    });
+  }
+</script>
+
+<%- include('layout/footer') %>
