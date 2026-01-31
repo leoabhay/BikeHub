@@ -25,11 +25,11 @@ const createVehicle = async (req, res) => {
       imageString = images.join(",");
     }
 
-    // Create vehicle with all fields, converting undefined to null where needed
-    const vehicleId = await Vehicle.create({
+    // Create vehicle with all fields
+    const newVehicle = await Vehicle.create({
       name,
       description: description || null,
-      price: price ? parseFloat(price) : null,
+      price: price ? parseFloat(price.toString().replace(/[^\d.]/g, '')) : null,
       image: imageString,
       model_year: model_year || null,
       mileage: mileage || null,
@@ -37,11 +37,9 @@ const createVehicle = async (req, res) => {
       fuel_type: fuel_type || null,
       transmission: transmission || null,
       color: color || null,
-      abs: abs !== undefined ? (abs ? 1 : 0) : 0, // Default to 0 if not provided
+      abs: abs !== undefined ? (parseInt(abs, 10) === 1) : false,
       brand_id,
     });
-
-    const newVehicle = await Vehicle.findById(vehicleId);
 
     res.status(201).json({
       message: "Vehicle added successfully",
@@ -53,9 +51,9 @@ const createVehicle = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-const getAllPrduct = async (req, res) => {
+const getAllProducts = async (req, res) => {
   try {
-    const page = parseInt(req.query.page, 1) || 1;
+    const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
 
     if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
@@ -73,11 +71,11 @@ const getAllPrduct = async (req, res) => {
     const result = await Vehicle.findAll(page, limit);
 
     if (!result) {
-      return res.status(400).json({ msg: "Vehicle not found" });
+      return res.status(404).json({ msg: "Vehicles not found" });
     }
     res.status(200).json({
-      msg: "Vehicle fetching successfully",
-      vehicle: result.data,
+      msg: "Vehicles fetched successfully",
+      vehicles: result.data,
       pagination: {
         total: result.total,
         currentPage: result.page,
@@ -88,12 +86,12 @@ const getAllPrduct = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Database error details", error);
+    console.error("Database error details:", error);
     res
       .status(500)
       .json({
         msg: "Error fetching vehicle data",
-        error: error.msg,
+        error: error.message,
         stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
   }
@@ -108,9 +106,9 @@ const getVehicleById = async (req, res) => {
     }
     res
       .status(200)
-      .json({ msg: "Vehicle fetching successfully", vehicle: productData });
+      .json({ msg: "Vehicle fetched successfully", vehicle: productData });
   } catch (error) {
-    res.status(500).json({ msg: "Error fetching data", error: error.msg });
+    res.status(500).json({ msg: "Error fetching data", error: error.message });
   }
 };
 
@@ -147,27 +145,22 @@ const updateVehicle = async (req, res) => {
     const vehicleData = {
       name,
       description,
-      price,
+      price: price ? parseFloat(price.toString().replace(/[^\d.]/g, '')) : undefined,
       model_year,
       mileage,
       engine_cc,
       fuel_type,
       transmission,
       color,
-      abs: abs !== undefined ? (abs ? 1 : 0) : undefined,
+      abs: abs !== undefined ? (parseInt(abs, 10) === 1) : undefined,
       brand_id,
       image: imageString,
     };
 
-    for (const key in vehicleData) {
-      if (vehicleData[key] === undefined) {
-        delete vehicleData[key];
-      }
-    }
+    // Remove undefined fields
+    Object.keys(vehicleData).forEach(key => vehicleData[key] === undefined && delete vehicleData[key]);
 
-    await Vehicle.update(productId, vehicleData);
-
-    const updatedProduct = await Vehicle.findById(productId);
+    const updatedProduct = await Vehicle.findByIdAndUpdate(productId, vehicleData, { new: true });
     res.status(200).json({
       msg: "Vehicle updated successfully",
       vehicle: updatedProduct,
@@ -183,10 +176,10 @@ const updateVehicle = async (req, res) => {
 const deleteVehicle = async (req, res) => {
   try {
     const productId = req.params.id;
-    await Vehicle.delete(productId);
+    await Vehicle.findByIdAndDelete(productId);
     res.status(200).json({ msg: "Vehicle deleted successfully" });
   } catch (error) {
-    res.status(500).json({ msg: "Error deleting admin", error: error.msg });
+    res.status(500).json({ msg: "Error deleting vehicle", error: error.message });
   }
 };
 
@@ -212,7 +205,7 @@ const getRelatedProducts = async (req, res) => {
 
     // Exclude the current vehicle from the related products
     const filteredRelatedProducts = relatedProducts.filter(
-      (vehicle) => vehicle.id !== productId
+      (vehicle) => vehicle._id.toString() !== productId
     );
 
     res.status(200).json({
@@ -230,68 +223,7 @@ const getRelatedProducts = async (req, res) => {
 
 const searchVehicles = async (req, res) => {
   try {
-    // Extract query parameters
-    const {
-      name,
-      brand,
-      model,
-      model_year,
-      min_price,
-      max_price,
-      sort_by,
-      sort_order,
-    } = req.query;
-
-    // Base query
-    let query = `
-      SELECT * FROM vehicles
-      WHERE 1=1
-    `;
-
-    // Array to hold parameter values
-    const params = [];
-
-    // Add filters based on query parameters
-    if (name) {
-      query += ` AND name LIKE ?`;
-      params.push(`%${name}%`);
-    }
-    if (brand) {
-      query += ` AND brand_id = ?`;
-      params.push(brand);
-    }
-    if (model) {
-      query += ` AND model LIKE ?`;
-      params.push(`%${model}%`);
-    }
-    if (model_year) {
-      query += ` AND model_year = ?`;
-      params.push(model_year);
-    }
-    if (min_price) {
-      query += ` AND price >= ?`;
-      params.push(min_price);
-    }
-    if (max_price) {
-      query += ` AND price <= ?`;
-      params.push(max_price);
-    }
-
-    // Add sorting
-    if (sort_by && sort_order) {
-      const validSortColumns = ["price", "model_year", "name"]; // Add valid columns for sorting
-      const validSortOrders = ["asc", "desc"];
-
-      if (
-        validSortColumns.includes(sort_by) &&
-        validSortOrders.includes(sort_order)
-      ) {
-        query += ` ORDER BY ${sort_by} ${sort_order}`;
-      }
-    }
-
-    // Execute the query
-    const [vehicles] = await pool.execute(query, params);
+    const vehicles = await Vehicle.search(req.query);
 
     res.status(200).json({
       msg: "Vehicles fetched successfully",
@@ -308,7 +240,7 @@ const searchVehicles = async (req, res) => {
 
 module.exports = {
   createVehicle,
-  getAllPrduct,
+  getAllProducts,
   getVehicleById,
   updateVehicle,
   deleteVehicle,

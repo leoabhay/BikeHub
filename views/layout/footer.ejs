@@ -7,11 +7,11 @@
       <div class="space-y-4">
         <div class="flex items-center space-x-3">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-            <i class="fa-solid fa-motorcycle text-xl text-white"></i>
+            <img src="/assets/logo.png" alt="BikeHub Logo" class="w-12 h-12 object-contain">
           </div>
           <div>
             <h3 class="text-2xl font-bold text-white">BikeHub</h3>
-            <p class="text-sm text-gray-300">Premium Bike Management</p>
+            <p class="text-sm text-gray-300">Bike Management System</p>
           </div>
         </div>
         <p class="text-gray-400 leading-relaxed">
@@ -138,7 +138,7 @@
           <div class="space-y-3 pt-4">
             <div class="flex items-center space-x-3 text-gray-400">
               <i class="fa-solid fa-envelope text-blue-400"></i>
-              <span>support@bikehub.com</span>
+              <span>abhaycdry10@gmail.com</span>
             </div>
             <div class="flex items-center space-x-3 text-gray-400">
               <i class="fa-solid fa-phone text-blue-400"></i>
@@ -146,7 +146,7 @@
             </div>
             <div class="flex items-center space-x-3 text-gray-400">
               <i class="fa-solid fa-location-dot text-blue-400"></i>
-              <span>Bhaktapur, Nepal</span>
+              <span>Saptari, Nepal</span>
             </div>
           </div>
         </div>
@@ -159,7 +159,7 @@
     <!-- Copyright & Bottom Bar -->
     <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
       <div class="text-gray-400 text-sm">
-        <p>&copy; 2025 BikeHub. All rights reserved.</p>
+        <p>&copy; <%= new Date().getFullYear() %> BikeHub. All rights reserved.</p>
         <p class="mt-1 text-xs text-gray-500">Made with <i class="fa-solid fa-heart text-red-400"></i> for bike enthusiasts</p>
       </div>
       
@@ -262,35 +262,37 @@
   }
   
   // Add CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slide-up {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    
-    @keyframes slide-down {
-      from { transform: translateY(0); opacity: 1; }
-      to { transform: translateY(100%); opacity: 0; }
-    }
-    
-    .animate-slide-up {
-      animation: slide-up 0.3s ease-out;
-    }
-    
-    .animate-slide-down {
-      animation: slide-down 0.3s ease-in forwards;
-    }
-    
-    .social-icon {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .social-icon:hover {
-      transform: translateY(-5px) rotate(5deg);
-    }
-  `;
-  document.head.appendChild(style);
+  {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slide-up {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      
+      @keyframes slide-down {
+        from { transform: translateY(0); opacity: 1; }
+        to { transform: translateY(100%); opacity: 0; }
+      }
+      
+      .animate-slide-up {
+        animation: slide-up 0.3s ease-out;
+      }
+      
+      .animate-slide-down {
+        animation: slide-down 0.3s ease-in forwards;
+      }
+      
+      .social-icon {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .social-icon:hover {
+        transform: translateY(-5px) rotate(5deg);
+      }
+    `;
+    document.head.appendChild(style);
+  }
   
   // Add hover effects to social icons
   document.querySelectorAll('footer a[target="_blank"]').forEach(icon => {

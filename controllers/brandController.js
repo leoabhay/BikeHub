@@ -10,8 +10,7 @@ const createBrand = async (req, res) => {
     const { name } = req.body;
     const logoPath = `/uploads/${req.file.filename}`;
 
-    const brandId = await Brand.create(name, logoPath);
-    const newBrand = await Brand.findById(brandId);
+    const newBrand = await Brand.create({ name, logo: logoPath });
 
     res.status(201).json({
       msg: "Brand created successfully",
@@ -35,7 +34,7 @@ const getBrandRecord = async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ msg: "Error fetching admin profile", error: error.msg });
+      .json({ msg: "Error fetching brand", error: error.message });
   }
 };
 
@@ -118,8 +117,7 @@ const updateBrand = async (req, res) => {
       ? `/uploads/${req.file.filename}`
       : existingBrand.logo;
 
-    await Brand.update(brandId, name, logoPath);
-    const updatedBrand = await Brand.findById(brandId);
+    const updatedBrand = await Brand.findByIdAndUpdate(brandId, { name, logo: logoPath }, { new: true });
 
     res.status(200).json({
       msg: "Brand updated successfully",
@@ -144,11 +142,11 @@ const deleteBrand = async (req, res) => {
       return res.status(404).json({ msg: "Brand not found" });
     }
 
-    const deletedRows = await Brand.delete(brandId);
+    const deletedBrand = await Brand.findByIdAndDelete(brandId);
 
     res.status(200).json({
       msg: "Brand deleted successfully",
-      deleted: deletedRows > 0,
+      deleted: !!deletedBrand,
     });
   } catch (error) {
     res.status(500).json({ msg: "Error deleting brand", error: error.message });

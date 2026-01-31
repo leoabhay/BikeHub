@@ -5,7 +5,9 @@ const productRoutes = require("./routes/vehiclesRoutes.js");
 const staticRoutes = require("./routes/staticRoutes.js");
 
 const rateLimit = require("express-rate-limit");
+const cookieParser = require("cookie-parser");
 const app = express();
+app.use(cookieParser());
 const path = require("path");
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
@@ -18,7 +20,7 @@ const limiter = rateLimit({
 
 app.use("/api/", limiter);
 app.use(express.static("public"));
-app.use("/assets", express.static(__dirname + "/views/assets"));
+app.use("/assets", express.static(path.join(__dirname, "views", "assets")));
 
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));

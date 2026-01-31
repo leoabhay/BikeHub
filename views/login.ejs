@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login | Bike Management System</title>
+    <title>BikeHub | Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -427,7 +427,7 @@
       <div class="login-header">
         <div class="logo">
           <div class="logo-icon">
-            <img src="/assets/logo.png">
+            <img src="/assets/logo.png" alt="BikeHub Logo" class="w-full h-full object-contain p-1">
           </div>
           <div class="logo-text">BikeHub</div>
         </div>
@@ -660,7 +660,7 @@
       // Sign up link
       signupLink.addEventListener('click', function(e) {
         e.preventDefault();
-        showNotification('Sign up feature coming soon!', 'error');
+        window.location.href = '/signup';
       });
 
       // Input validation on blur

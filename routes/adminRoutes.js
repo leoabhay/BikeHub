@@ -13,6 +13,7 @@ router.post('/logout', (req, res) => {
 
 router.get('/profile', authMiddleware, adminController.getAdminProfile);
 router.put('/profile', authMiddleware, adminController.updateAdminProfile);
+router.put('/password', authMiddleware, adminController.updateAdminPassword);
 router.delete('/delete', authMiddleware, adminController.deleteAdmin);
 
 module.exports = router;

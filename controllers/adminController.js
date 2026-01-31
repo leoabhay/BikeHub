@@ -11,16 +11,16 @@ const registerAdmin = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the admin
-    const adminId = await Admin.create(
+    const newAdmin = await Admin.create({
       username,
-      hashedPassword,
+      password: hashedPassword,
       phone_number,
       address
-    );
+    });
 
     res
       .status(201)
-      .json({ message: "Admin registered successfully", id: adminId });
+      .json({ message: "Admin registered successfully", id: newAdmin._id });
   } catch (error) {
     res
       .status(500)
@@ -41,7 +41,11 @@ const loginAdmin = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
     }
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: admin.id, username: admin.username, role: admin.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
     // res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
     res.cookie('token', token, { httpOnly: true });
@@ -61,7 +65,8 @@ const getAdminProfile = async (req, res) => {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    const { password, ...adminData } = admin;
+    const adminObj = admin.toObject();
+    const { password: _, ...adminData } = adminObj;
 
     res.status(200).json(adminData);
   } catch (error) {
@@ -91,7 +96,7 @@ const updateAdminProfile = async (req, res) => {
 const deleteAdmin = async (req, res) => {
   try {
     const adminId = req.user.id;
-    await Admin.delete(adminId);
+    await Admin.findByIdAndDelete(adminId);
 
     res.status(200).json({ message: "Admin deleted successfully" });
   } catch (error) {
@@ -101,10 +106,28 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
+const updateAdminPassword = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+    const { newPassword } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await Admin.updatePassword(adminId, hashedPassword);
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating password",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerAdmin,
   loginAdmin,
   getAdminProfile,
   updateAdminProfile,
   deleteAdmin,
+  updateAdminPassword,
 };

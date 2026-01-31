@@ -1,44 +1,56 @@
-const pool = require('../config/db');
+const mongoose = require('mongoose');
 
-class Admin {
-  // Create a new admin
-  static async create(username, password, phone_number, address, role = 'admin') {
-    const query = 'INSERT INTO admins (username, password, phone_number, address, role) VALUES (?, ?, ?, ?, ?)';
-    const [result] = await pool.execute(query, [username, password, phone_number, address, role]);
-    return result.insertId;
-  }
+const adminSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  phone_number: {
+    type: String,
+    trim: true,
+  },
+  address: {
+    type: String,
+    trim: true,
+  },
+  role: {
+    type: String,
+    default: 'admin',
+    enum: ['admin', 'superadmin'],
+  },
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+});
 
-  // Find an admin by username
-  static async findByUsername(username) {
-    const query = 'SELECT * FROM admins WHERE username = ?';
-    const [rows] = await pool.execute(query, [username]);
-    return rows[0];
-  }
+// Static methods for compatibility with existing controllers
+adminSchema.statics.findByUsername = function(username) {
+  return this.findOne({ username });
+};
 
-  // Find an admin by ID
-  static async findById(id) {
-    const query = 'SELECT * FROM admins WHERE id = ?';
-    const [rows] = await pool.execute(query, [id]);
-    return rows[0];
-  }
+adminSchema.statics.updatePassword = function(id, newPassword) {
+  return this.findByIdAndUpdate(id, { password: newPassword });
+};
 
-  // Update an admin's password
-  static async updatePassword(id, newPassword) {
-    const query = 'UPDATE admins SET password = ? WHERE id = ?';
-    await pool.execute(query, [newPassword, id]);
-  }
+adminSchema.statics.updateProfile = function(id, phone_number, address) {
+  return this.findByIdAndUpdate(id, { phone_number, address });
+};
 
-  // Update an admin's phone number and address
-  static async updateProfile(id, phone_number, address) {
-    const query = 'UPDATE admins SET phone_number = ?, address = ? WHERE id = ?';
-    await pool.execute(query, [phone_number, address, id]);
-  }
+// Override create to match MySQL implementation if needed, 
+// but Mongoose's Model.create already works similarly.
+// The existing controllers call Admin.create(username, password, phone_number, address, role)
+const originalCreate = adminSchema.statics.create;
+adminSchema.statics.createAdmin = function(username, password, phone_number, address, role = 'admin') {
+  return new this({ username, password, phone_number, address, role }).save();
+};
 
-  // Delete an admin by ID
-  static async delete(id) {
-    const query = 'DELETE FROM admins WHERE id = ?';
-    await pool.execute(query, [id]);
-  }
-}
+const Admin = mongoose.model('Admin', adminSchema);
 
 module.exports = Admin;

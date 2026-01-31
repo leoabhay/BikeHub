@@ -500,41 +500,43 @@
   }
 
   // Add CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slide-in-right {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slide-out-right {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    @keyframes scale-in {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    
-    .animate-slide-in-right {
-      animation: slide-in-right 0.3s ease-out;
-    }
-    
-    .animate-slide-out-right {
-      animation: slide-out-right 0.3s ease-in forwards;
-    }
-    
-    .animate-scale-in {
-      animation: scale-in 0.2s ease-out;
-    }
-    
-    .glass-effect {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(10px);
-    }
-  `;
-  document.head.appendChild(style);
+  {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slide-in-right {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes slide-out-right {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+      
+      @keyframes scale-in {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      
+      .animate-slide-in-right {
+        animation: slide-in-right 0.3s ease-out;
+      }
+      
+      .animate-slide-out-right {
+        animation: slide-out-right 0.3s ease-in forwards;
+      }
+      
+      .animate-scale-in {
+        animation: scale-in 0.2s ease-out;
+      }
+      
+      .glass-effect {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+      }
+    `;
+    document.head.appendChild(style);
+  }
 </script>
 
 <%- include('layout/footer.ejs') %>

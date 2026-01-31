@@ -7,7 +7,7 @@
     <!-- Header Section -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
       <div>
-        <h1 class="text-4xl font-bold text-white mb-2">Bike Inventory</h1>
+        <h1 class="text-4xl font-bold text-white mb-2">BikeHub Inventory</h1>
         <p class="text-gray-300">Manage and track all your bike records</p>
       </div>
       
@@ -29,7 +29,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Total Bikes</p>
-            <p class="text-3xl font-bold text-white mt-1">-</p>
+            <p class="text-3xl font-bold text-white mt-1"><%= stats.total %></p>
           </div>
           <div class="p-3 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-xl">
             <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,7 +43,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Petrol Bikes</p>
-            <p class="text-3xl font-bold text-white mt-1">-</p>
+            <p class="text-3xl font-bold text-white mt-1"><%= stats.petrol %></p>
           </div>
           <div class="p-3 bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 rounded-xl">
             <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Electric Bikes</p>
-            <p class="text-3xl font-bold text-white mt-1">-</p>
+            <p class="text-3xl font-bold text-white mt-1"><%= stats.electric %></p>
           </div>
           <div class="p-3 bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-xl">
             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +71,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-gray-400 text-sm">Avg Price</p>
-            <p class="text-3xl font-bold text-white mt-1">-</p>
+            <p class="text-3xl font-bold text-white mt-1">₹<%= stats.avgPrice.toLocaleString('en-IN') %></p>
           </div>
           <div class="p-3 bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-xl">
             <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,7 +273,7 @@
                         src="/uploads/<%= vh.image.split(',')[0] %>"
                         alt="<%= vh.name %>"
                         class="w-16 h-16 object-cover rounded-xl border-2 border-gray-600 group-hover/image:border-blue-500 transition-all duration-300"
-                        onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"64\" height=\"64\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236b7280\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"></rect><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"></circle><polyline points=\"21 15 16 10 5 21\"></polyline></svg>
+                        onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'64\' height=\'64\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%236b7280\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'2\' ry=\'2\'></rect><circle cx=\'8.5\' cy=\'8.5\' r=\'1.5\'></circle><polyline points=\'21 15 16 10 5 21\'></polyline></svg>';" />
                       <% if (vh.image.split(',').length > 1) { %>
                         <div class="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs">
                           +<%= vh.image.split(',').length - 1 %>
@@ -565,41 +565,43 @@
   }
 
   // Add CSS animations
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes slide-in-right {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slide-out-right {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    @keyframes scale-in {
-      from { transform: scale(0.9); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    
-    .animate-slide-in-right {
-      animation: slide-in-right 0.3s ease-out;
-    }
-    
-    .animate-slide-out-right {
-      animation: slide-out-right 0.3s ease-in forwards;
-    }
-    
-    .animate-scale-in {
-      animation: scale-in 0.2s ease-out;
-    }
-    
-    .glass-effect {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(10px);
-    }
-  `;
-  document.head.appendChild(style);
+  {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slide-in-right {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes slide-out-right {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+      
+      @keyframes scale-in {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      
+      .animate-slide-in-right {
+        animation: slide-in-right 0.3s ease-out;
+      }
+      
+      .animate-slide-out-right {
+        animation: slide-out-right 0.3s ease-in forwards;
+      }
+      
+      .animate-scale-in {
+        animation: scale-in 0.2s ease-out;
+      }
+      
+      .glass-effect {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   // Image error handler
   document.addEventListener('DOMContentLoaded', function() {
